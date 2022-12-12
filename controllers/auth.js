@@ -1,5 +1,6 @@
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
+const mysql = require('mysql');
 
 //Register
 const register = async (req, res) => {
@@ -63,7 +64,7 @@ const login = async (req, res) => {
     // }
 }
 //Get me
-const getMe = async (req, res) => {
+const getMe = async (req, response) => {
     try {
         console.log('kekushka')
         let connection = mysql.createConnection({
@@ -73,7 +74,7 @@ const getMe = async (req, res) => {
             database: process.env.DB_NAME
         });
 
-        connection.connect(err => {
+        await connection.connect(err => {
             if (err) {
                 console.log(err)
                 return err
@@ -83,10 +84,10 @@ const getMe = async (req, res) => {
         });
 
         let query = { sql: 'SELECT * FROM secret.users INNER JOIN secret.role ON secret.users.role = secret.role.idRole INNER JOIN secret.casa ON secret.users.casaId = secret.casa.idCasa', nestTables: true }
-        connection.query(query, (err, res) => {
+        await connection.query(query, (err, res) => {
             console.log(err)
             console.log(res)
-            return res.json({ res })
+            return response.json({ res })
         })
         connection.end(err => {
             if (err) {
